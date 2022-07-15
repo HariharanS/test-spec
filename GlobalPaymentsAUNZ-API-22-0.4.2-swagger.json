@@ -1,0 +1,1017 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "version" : "0.4.2",
+    "title" : "API 22",
+    "description" : "GPAUNZ Payments API"
+  },
+  "servers" : [ {
+    "description" : "SwaggerHub",
+    "url" : "https://virtserver.swaggerhub.com/GlobalPaymentsAUNZ/API-22/0.0.3"
+  }, {
+    "description" : "Mockoon",
+    "url" : "https://rapidv6.test.ewaylabs.cloud"
+  }, {
+    "description" : "Client Integration",
+    "url" : "https://mock.globalrapid.io"
+  }, {
+    "description" : "App Runner",
+    "url" : "https://wkw6gpbmjm.ap-northeast-1.awsapprunner.com"
+  } ],
+  "paths" : {
+    "/payout" : {
+      "post" : {
+        "summary" : "PayOut",
+        "description" : "Send funds to a payee's account.",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/ApiKey"
+        }, {
+          "$ref" : "#/components/parameters/IdempotencyKey"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK.",
+            "headers" : {
+              "x-correlation-id" : {
+                "$ref" : "#/components/headers/CorrelationId"
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PayOutResponse"
+                },
+                "examples" : {
+                  "approved" : {
+                    "summary" : "Approved",
+                    "value" : {
+                      "id" : "e945e8vh0a9szsxig9pohvs9i3lrmw",
+                      "reference" : "e539289db3a9445a8c2854ed4e9aa5cd",
+                      "result" : {
+                        "status" : "approved"
+                      }
+                    }
+                  },
+                  "pending" : {
+                    "summary" : "Pending",
+                    "value" : {
+                      "id" : "e945e8vh0a9szsxig9pohvs9i3lrmw",
+                      "reference" : "e539289db3a9445a8c2854ed4e9aa5cd",
+                      "result" : {
+                        "status" : "pending"
+                      }
+                    }
+                  },
+                  "declined" : {
+                    "summary" : "Declined",
+                    "value" : {
+                      "id" : "e945e8vh0a9szsxig9pohvs9i3lrmw",
+                      "reference" : "e539289db3a9445a8c2854ed4e9aa5cd",
+                      "result" : {
+                        "status" : "declined",
+                        "codes" : [ {
+                          "id" : "D10101",
+                          "message" : "target_account_invalid"
+                        }, {
+                          "id" : "D10201",
+                          "message" : "from_account_closed"
+                        } ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request.",
+            "headers" : {
+              "x-correlation-id" : {
+                "$ref" : "#/components/headers/CorrelationId"
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Result"
+                },
+                "examples" : {
+                  "result" : {
+                    "summary" : "Validation Error",
+                    "value" : {
+                      "result" : {
+                        "status" : "validation_error",
+                        "codes" : [ {
+                          "id" : "V10101",
+                          "message" : "header_idempotency_key_invalid"
+                        }, {
+                          "id" : "V10202",
+                          "message" : "body_amount_invalid"
+                        } ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error.",
+            "headers" : {
+              "x-correlation-id" : {
+                "$ref" : "#/components/headers/CorrelationId"
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PayOutResponse"
+                },
+                "examples" : {
+                  "systemerrorwithid" : {
+                    "summary" : "System Error with Id",
+                    "value" : {
+                      "id" : "e945e8vh0a9szsxig9pohvs9i3lrmw",
+                      "reference" : "e539289db3a9445a8c2854ed4e9aa5cd",
+                      "result" : {
+                        "status" : "system_error",
+                        "codes" : [ {
+                          "id" : "S10001",
+                          "message" : "idempotency_key_used"
+                        } ]
+                      }
+                    }
+                  },
+                  "systemerrorwithoutid" : {
+                    "summary" : "System Error without Id",
+                    "value" : {
+                      "reference" : "e539289db3a9445a8c2854ed4e9aa5cd",
+                      "result" : {
+                        "status" : "system_error",
+                        "codes" : [ {
+                          "id" : "S10000",
+                          "message" : "system_error"
+                        } ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody" : {
+          "description" : "Payout request.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PayOutRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payout/{id}" : {
+      "get" : {
+        "summary" : "PayOut",
+        "description" : "Retrieve results from a previous payout.",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/ApiKey"
+        }, {
+          "in" : "path",
+          "name" : "id",
+          "description" : "The payment Id from a previous payout.",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "example" : "MTEyMjMzNDQ="
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK.",
+            "headers" : {
+              "x-correlation-id" : {
+                "$ref" : "#/components/headers/CorrelationId"
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PayOutResponse"
+                },
+                "examples" : {
+                  "approved" : {
+                    "summary" : "Approved",
+                    "value" : {
+                      "id" : "e945e8vh0a9szsxig9pohvs9i3lrmw",
+                      "reference" : "e539289db3a9445a8c2854ed4e9aa5cd",
+                      "result" : {
+                        "status" : "approved"
+                      }
+                    }
+                  },
+                  "pending" : {
+                    "summary" : "Pending",
+                    "value" : {
+                      "id" : "e945e8vh0a9szsxig9pohvs9i3lrmw",
+                      "reference" : "e539289db3a9445a8c2854ed4e9aa5cd",
+                      "result" : {
+                        "status" : "pending"
+                      }
+                    }
+                  },
+                  "declined" : {
+                    "summary" : "Declined",
+                    "value" : {
+                      "id" : "e945e8vh0a9szsxig9pohvs9i3lrmw",
+                      "reference" : "e539289db3a9445a8c2854ed4e9aa5cd",
+                      "result" : {
+                        "status" : "declined",
+                        "codes" : [ {
+                          "id" : "D10101",
+                          "message" : "target_account_invalid"
+                        }, {
+                          "id" : "D10201",
+                          "message" : "from_account_closed"
+                        } ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request.",
+            "headers" : {
+              "x-correlation-id" : {
+                "$ref" : "#/components/headers/CorrelationId"
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Result"
+                },
+                "examples" : {
+                  "result" : {
+                    "summary" : "Validation Error",
+                    "value" : {
+                      "result" : {
+                        "status" : "validation_error",
+                        "codes" : [ {
+                          "id" : "V10001",
+                          "message" : "route_parameter_id_invalid"
+                        } ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error.",
+            "headers" : {
+              "x-correlation-id" : {
+                "$ref" : "#/components/headers/CorrelationId"
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PayOutResponse"
+                },
+                "examples" : {
+                  "systemerrorwithoutid" : {
+                    "summary" : "System Error without Id",
+                    "value" : {
+                      "result" : {
+                        "status" : "system_error",
+                        "codes" : [ {
+                          "id" : "S10000",
+                          "message" : "system_error"
+                        } ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payouts" : {
+      "get" : {
+        "summary" : "Get previous payouts by the client's payment reference.",
+        "description" : "Retrieve results from a previous payout.",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/ApiKey"
+        }, {
+          "in" : "query",
+          "name" : "paymentReference",
+          "description" : "The payment reference from a previous payout.",
+          "schema" : {
+            "type" : "string",
+            "example" : "KHJSuijsIJwu="
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK.",
+            "headers" : {
+              "x-correlation-id" : {
+                "$ref" : "#/components/headers/CorrelationId"
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PayoutQueryResponse"
+                },
+                "examples" : {
+                  "approved" : {
+                    "summary" : "Approved",
+                    "value" : {
+                      "payouts" : [ {
+                        "id" : "e945e8vh0a9szsxig9pohvs9i3lrmw",
+                        "reference" : "e539289db3a9445a8c2854ed4e9aa5cd",
+                        "result" : {
+                          "status" : "approved"
+                        }
+                      } ]
+                    }
+                  },
+                  "pending" : {
+                    "summary" : "Pending",
+                    "value" : {
+                      "payouts" : [ {
+                        "id" : "e945e8vh0a9szsxig9pohvs9i3lrmw",
+                        "reference" : "e539289db3a9445a8c2854ed4e9aa5cd",
+                        "result" : {
+                          "status" : "pending"
+                        }
+                      } ]
+                    }
+                  },
+                  "declined" : {
+                    "summary" : "Declined",
+                    "value" : {
+                      "payouts" : [ {
+                        "id" : "e945e8vh0a9szsxig9pohvs9i3lrmw",
+                        "reference" : "e539289db3a9445a8c2854ed4e9aa5cd",
+                        "result" : {
+                          "status" : "declined",
+                          "codes" : [ {
+                            "id" : "D10101",
+                            "message" : "target_account_invalid"
+                          }, {
+                            "id" : "D10201",
+                            "message" : "from_account_closed"
+                          } ]
+                        }
+                      } ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request.",
+            "headers" : {
+              "x-correlation-id" : {
+                "$ref" : "#/components/headers/CorrelationId"
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Result"
+                },
+                "examples" : {
+                  "result" : {
+                    "summary" : "Validation Error",
+                    "value" : {
+                      "result" : {
+                        "status" : "validation_error",
+                        "codes" : [ {
+                          "id" : "V10001",
+                          "message" : "query_parameter_paymentReference_invalid"
+                        } ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error.",
+            "headers" : {
+              "x-correlation-id" : {
+                "$ref" : "#/components/headers/CorrelationId"
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PayOutResponse"
+                },
+                "examples" : {
+                  "systemerrorwithoutid" : {
+                    "summary" : "System Error without Id",
+                    "value" : {
+                      "result" : {
+                        "status" : "system_error",
+                        "codes" : [ {
+                          "id" : "S10000",
+                          "message" : "system_error"
+                        } ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/paymentAgreement" : {
+      "post" : {
+        "summary" : "Create the payment agreement",
+        "description" : "Create the payment agreement between a merchant and their customer, that will allow the merchant to automatically deduct funds using the customer's banking details.",
+        "parameters" : [ {
+          "$ref" : "#/components/parameters/ApiKey"
+        }, {
+          "$ref" : "#/components/parameters/IdempotencyKey"
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Payment Agreement Created.",
+            "headers" : {
+              "x-correlation-id" : {
+                "$ref" : "#/components/headers/CorrelationId"
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PaymentAgreementResponse"
+                },
+                "examples" : {
+                  "approved" : {
+                    "summary" : "ok",
+                    "value" : {
+                      "paymentAgreementId" : "K+9p4EE0rJnMtomRfWKWEDRh82BnAboHP2KwgIPyEIA=",
+                      "paymentAgreementStatus" : "created",
+                      "createdDatetime" : "2021-08-09T08:22:10.106Z",
+                      "registrationDatetime" : "2021-08-09T08:22:10.106Z",
+                      "result" : {
+                        "status" : "ok"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request.",
+            "headers" : {
+              "x-correlation-id" : {
+                "$ref" : "#/components/headers/CorrelationId"
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Result"
+                },
+                "examples" : {
+                  "result" : {
+                    "summary" : "Validation Error",
+                    "value" : {
+                      "result" : {
+                        "status" : "validation_error",
+                        "codes" : [ {
+                          "id" : "V10202",
+                          "message" : "Body_Invalid_Amount"
+                        }, {
+                          "id" : "V10203",
+                          "message" : "Body_Invalid_Account.BSB"
+                        } ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error.",
+            "headers" : {
+              "x-correlation-id" : {
+                "$ref" : "#/components/headers/CorrelationId"
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Result"
+                },
+                "examples" : {
+                  "systemerrorwithoutid" : {
+                    "value" : {
+                      "result" : {
+                        "status" : "system_error",
+                        "codes" : [ {
+                          "id" : "S10000",
+                          "message" : "system_error"
+                        }, {
+                          "id" : "S10002",
+                          "message" : "System_Setting_Incorrect"
+                        } ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody" : {
+          "description" : "The type of direct transaction.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PaymentAgreementRequest"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "headers" : {
+      "CorrelationId" : {
+        "description" : "It is unique id assigned to each request",
+        "schema" : {
+          "type" : "string",
+          "format" : "uuid",
+          "example" : "ca8146ea-d700-42ee-9922-84554351e439"
+        }
+      }
+    },
+    "parameters" : {
+      "ApiKey" : {
+        "in" : "header",
+        "name" : "x-api-key",
+        "description" : "API Key",
+        "required" : true,
+        "schema" : {
+          "type" : "string",
+          "example" : "eyJ1c2VyIjogMTIzNCwgImFwaUtleSI6ICJ0ZXN0MTIzNCJ9"
+        }
+      },
+      "IdempotencyKey" : {
+        "in" : "header",
+        "name" : "x-idempotency-key",
+        "description" : "Idempotency key - unique value for each request.",
+        "required" : true,
+        "schema" : {
+          "type" : "string",
+          "example" : "739b8d46-30b7-410b-941e-a2a0c56f8b87"
+        }
+      }
+    },
+    "schemas" : {
+      "ResponseCode" : {
+        "type" : "object",
+        "required" : [ "id", "message" ],
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "example" : "S10001",
+            "description" : "Unique Id of the Response Code"
+          },
+          "message" : {
+            "type" : "string",
+            "example" : "idempotency_key_used",
+            "description" : "Short message describing the Response Code"
+          }
+        }
+      },
+      "Result" : {
+        "type" : "object",
+        "required" : [ "status" ],
+        "properties" : {
+          "status" : {
+            "type" : "string",
+            "enum" : [ "approved", "pending", "declined", "validation_error", "system_error", "ok" ],
+            "example" : "system_error",
+            "description" : "Status of the API Request"
+          },
+          "codes" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ResponseCode"
+            },
+            "description" : "Optional in cases like where status is approved, pending etc"
+          }
+        }
+      },
+      "Account" : {
+        "type" : "object",
+        "description" : "Bank Account details",
+        "required" : [ "bsb", "number" ],
+        "properties" : {
+          "bsb" : {
+            "type" : "string",
+            "format" : "number",
+            "minLength" : 6,
+            "maxLength" : 6,
+            "description" : "Payee's Account BSB. Should be present when account.number is present.",
+            "example" : "012306"
+          },
+          "number" : {
+            "type" : "string",
+            "format" : "number",
+            "minLength" : 6,
+            "maxLength" : 12,
+            "description" : "Payee's Bank Account number. ",
+            "example" : "12345678"
+          }
+        }
+      },
+      "PayID" : {
+        "type" : "object",
+        "required" : [ "payID", "payIDType" ],
+        "properties" : {
+          "payID" : {
+            "type" : "string",
+            "minLength" : 5,
+            "maxLength" : 2048,
+            "example" : "john.smith@gmail.com",
+            "description" : "Payer's PayID (account alias). \nShould not be specified when accountNumber and bsb are defined."
+          },
+          "payIDType" : {
+            "type" : "string",
+            "example" : "email",
+            "description" : "Specifies the type of the payId used.\n Only specified when payId is defined.",
+            "enum" : [ "phone", "email", "abn", "org" ]
+          }
+        }
+      },
+      "PaymentInstrument" : {
+        "type" : "object",
+        "description" : "Defines instrument used to process the payment or transaction",
+        "properties" : {
+          "account" : {
+            "$ref" : "#/components/schemas/Account"
+          },
+          "payID" : {
+            "$ref" : "#/components/schemas/PayID"
+          }
+        }
+      },
+      "PayOutRequest" : {
+        "type" : "object",
+        "properties" : {
+          "payee" : {
+            "type" : "object",
+            "required" : [ "name" ],
+            "properties" : {
+              "name" : {
+                "type" : "string",
+                "minLength" : 5,
+                "maxLength" : 140,
+                "description" : "Payee's name provided by the customer.",
+                "example" : "Mr. John Smith"
+              }
+            }
+          },
+          "payment" : {
+            "type" : "object",
+            "required" : [ "reference", "description", "amount", "instrument" ],
+            "properties" : {
+              "reference" : {
+                "type" : "string",
+                "maxLength" : 50,
+                "description" : "Client's Payment Reference. This is unique for the request and can be used to query the payment when payment.id is not present.",
+                "example" : "e539289db3a9445a8c2854ed4e9aa5cd"
+              },
+              "description" : {
+                "type" : "string",
+                "minLength" : 5,
+                "maxLength" : 280,
+                "description" : "Description of the payment.",
+                "example" : "Disbursment of loan amount"
+              },
+              "amount" : {
+                "type" : "number",
+                "format" : "int32",
+                "description" : "Amount(AUD) for the payment (in cents)",
+                "example" : 100
+              },
+              "instrument" : {
+                "$ref" : "#/components/schemas/PaymentInstrument"
+              }
+            }
+          }
+        }
+      },
+      "PayOutResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "maxLength" : 30,
+            "example" : "e945e8vh0a9szsxig9pohvs9i3lrmw",
+            "description" : "Unique GP Payment Identifier."
+          },
+          "reference" : {
+            "type" : "string",
+            "maxLength" : 50,
+            "description" : "Client's Payment Reference that was passed in the request.",
+            "example" : "e539289db3a9445a8c2854ed4e9aa5cd"
+          },
+          "result" : {
+            "$ref" : "#/components/schemas/Result"
+          }
+        }
+      },
+      "PayoutQueryResponse" : {
+        "type" : "object",
+        "properties" : {
+          "payouts" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PayOutResponse"
+            }
+          }
+        }
+      },
+      "PaymentAgreementRequest" : {
+        "type" : "object",
+        "required" : [ "payer" ],
+        "properties" : {
+          "payer" : {
+            "type" : "object",
+            "required" : [ "name", "type" ],
+            "properties" : {
+              "name" : {
+                "type" : "string",
+                "maxLength" : 140,
+                "pattern" : "^[a-zA-Z0-9 ]*$",
+                "description" : "Name of the customer who will be making payments",
+                "example" : "Mr. John Smith"
+              },
+              "type" : {
+                "type" : "string",
+                "maxLength" : 4,
+                "minLength" : 4,
+                "description" : "organisation = an organisation or person = a private individual",
+                "example" : "organisation",
+                "enum" : [ "organisation", "person" ]
+              },
+              "instrument" : {
+                "$ref" : "#/components/schemas/PaymentInstrument"
+              }
+            }
+          },
+          "payee" : {
+            "type" : "object",
+            "properties" : {
+              "ultimateCreditorName" : {
+                "type" : "string",
+                "maxLength" : 140,
+                "pattern" : "^[a-zA-Z0-9 ]*$",
+                "description" : "This is the merchant who the funds from the payment agreement will be paid to - this is applicable for PayFac access, otherwise it will be populated from the merchants details in CRM.",
+                "example" : "Grace Lovi"
+              }
+            }
+          },
+          "agreementDetails" : {
+            "type" : "object",
+            "required" : [ "startDate", "frequency", "paymentAgreementType", "establishmentType", "amountType" ],
+            "properties" : {
+              "paymentAgreementType" : {
+                "type" : "string",
+                "maxLength" : 20,
+                "description" : "Type of payments being made, use the predefined options.",
+                "example" : "mortgage",
+                "enum" : [ "mortgage", "utility", "loan", "dependant support", "gambling", "retail", "salary", "personal", "government", "pension", "tax", "other service" ]
+              },
+              "frequency" : {
+                "type" : "string",
+                "example" : "adhoc",
+                "description" : "How often payments may be debited from the payer customer, it must be one of the predifined values.",
+                "maxLength" : 15,
+                "minLength" : 4,
+                "enum" : [ "adhoc", "daily", "fortnightly", "intraday", "semiannual", "monthly", "quarterly", "weekly", "annual" ]
+              },
+              "establishmentType" : {
+                "type" : "string",
+                "example" : "authorised",
+                "maxLength" : 10,
+                "minLength" : 4,
+                "description" : "Technical code (authorised = Authorised Payment Mandate or migrated = Migrated DDR Mandate) identifying the scheme associated to the agreement.",
+                "enum" : [ "authorised", "migrated" ]
+              },
+              "amountType" : {
+                "type" : "string",
+                "example" : "balloon",
+                "maxLength" : 4,
+                "minLength" : 4,
+                "description" : "Must be one of balloon (Payment amount is fixed with large final payment amount), fixed (Payment amount is fixed), usage = Usage Based (Payment amount is based on usage), variable = Variable (Payment amount is variable).",
+                "enum" : [ "balloon", "fixed", "usage", "variable" ]
+              },
+              "startDate" : {
+                "type" : "string",
+                "format" : "date",
+                "example" : "2022-01-01",
+                "maxLength" : 10,
+                "description" : "Denotes the starting date (YYYY-MM-DD) of the Payment Agreement from which payments may be initiated against it."
+              },
+              "description" : {
+                "type" : "string",
+                "example" : "Monthly Gym Membership",
+                "description" : "Description of what the Payment Agreement is being established for.",
+                "maxLength" : 140
+              },
+              "conditionsOfPayment" : {
+                "type" : "string",
+                "example" : "Required transfer of property.",
+                "description" : "Where this Payment Agreement is being established with consideration to the transfer of items/goods/services.",
+                "maxLength" : 140
+              }
+            },
+            "oneOf" : [ {
+              "$ref" : "#/components/schemas/BalloonAgreementDetailsObj"
+            }, {
+              "$ref" : "#/components/schemas/VariableAgreementDetailsObj"
+            }, {
+              "$ref" : "#/components/schemas/FixedAgreementDetailsObj"
+            }, {
+              "$ref" : "#/components/schemas/UsageAgreementDetailsObj"
+            } ]
+          }
+        }
+      },
+      "PaymentAgreementResponse" : {
+        "required" : [ "paymentAgreementId", "status", "createdDatetime" ],
+        "type" : "object",
+        "properties" : {
+          "paymentAgreementId" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "example" : "K+9p4EE0rJnMtomRfWKWEDRh82BnAboHP2KwgIPyEIA=",
+            "description" : "The unique identifier assigned to the mandate by the NPP MPS.\nThis should be used in the URL for all subsequent requests for this mandate."
+          },
+          "paymentAgreementStatus" : {
+            "type" : "string",
+            "description" : "Status of the requested payment agreement.",
+            "enum" : [ "created", "active", "suspended", "cancelled", "failed" ]
+          },
+          "createdDatetime" : {
+            "type" : "string",
+            "format" : "date-time",
+            "example" : "2021-08-09T08:22:10.106Z",
+            "description" : "Timestamp (YYYY-MM-DDThh:mm:ss[.mmm]TZD) when the payment agreement was created"
+          },
+          "registrationDatetime" : {
+            "type" : "string",
+            "format" : "date-time",
+            "example" : "2021-08-09T08:22:10.106Z",
+            "description" : "The date and time (YYYY-MM-DDThh:mm:ss[.mmm]TZD) and time when the agreement was registered."
+          },
+          "result" : {
+            "$ref" : "#/components/schemas/Result"
+          }
+        }
+      },
+      "VariableAgreementDetails" : {
+        "type" : "object",
+        "properties" : {
+          "endDate" : {
+            "type" : "string",
+            "format" : "date",
+            "example" : "2022-12-01",
+            "maxLength" : 10,
+            "description" : "The final date (YYYY-MM-DD) upon which payments may be ended against this Payment Agreement."
+          },
+          "maximumAmount" : {
+            "type" : "number",
+            "format" : "int32",
+            "example" : 100,
+            "description" : "The maximum amount in AUD cents that may be debited in a single payment initiation"
+          }
+        }
+      },
+      "VariableAgreementDetailsObj" : {
+        "type" : "object",
+        "properties" : {
+          "variableAgreementDetails" : {
+            "$ref" : "#/components/schemas/VariableAgreementDetails"
+          }
+        }
+      },
+      "FixedAgreementDetails" : {
+        "type" : "object",
+        "properties" : {
+          "endDate" : {
+            "type" : "string",
+            "format" : "date",
+            "example" : "2022-12-01",
+            "maxLength" : 10,
+            "description" : "The final date (YYYY-MM-DD) upon which payments may be ended against this Payment Agreement."
+          },
+          "amount" : {
+            "type" : "number",
+            "format" : "int32",
+            "example" : 100,
+            "description" : "General amount in AUD cents authorized by the agreement. Must be specified where the Payment Amount Type is fixed or balloon."
+          },
+          "firstAmount" : {
+            "type" : "number",
+            "format" : "int32",
+            "example" : 100,
+            "description" : "Amount in AUD cents which may be debited on the First Payment date."
+          }
+        }
+      },
+      "FixedAgreementDetailsObj" : {
+        "type" : "object",
+        "properties" : {
+          "fixedAgreementDetails" : {
+            "$ref" : "#/components/schemas/FixedAgreementDetails"
+          }
+        }
+      },
+      "UsageAgreementDetails" : {
+        "type" : "object",
+        "properties" : {
+          "endDate" : {
+            "type" : "string",
+            "format" : "date",
+            "example" : "2022-12-01",
+            "maxLength" : 10,
+            "description" : "The final date (YYYY-MM-DD) upon which payments may be ended against this Payment Agreement."
+          },
+          "maximumAmount" : {
+            "type" : "number",
+            "format" : "int32",
+            "example" : 100,
+            "description" : "The maximum amount in AUD cents that may be debited in a single payment initiation"
+          }
+        }
+      },
+      "UsageAgreementDetailsObj" : {
+        "type" : "object",
+        "properties" : {
+          "usageAgreementDetails" : {
+            "$ref" : "#/components/schemas/UsageAgreementDetails"
+          }
+        }
+      },
+      "BalloonAgreementDetailsObj" : {
+        "type" : "object",
+        "properties" : {
+          "balloonAgreementDetails" : {
+            "$ref" : "#/components/schemas/BalloonAgreementDetails"
+          }
+        }
+      },
+      "BalloonAgreementDetails" : {
+        "type" : "object",
+        "properties" : {
+          "lastPaymentDate" : {
+            "type" : "string",
+            "format" : "date",
+            "example" : "2021-08-09",
+            "maxLength" : 10,
+            "description" : "Date (YYYY-MM-DD) at which the last payment may be debited. This must be before or on the Payment agreement validity end date"
+          },
+          "amount" : {
+            "type" : "number",
+            "format" : "int32",
+            "example" : 100,
+            "description" : "General amount in AUD cents authorized by the agreement. Must be specified where the Payment Amount Type is fixed or balloon."
+          },
+          "lastAmount" : {
+            "type" : "number",
+            "format" : "int32",
+            "example" : 100,
+            "description" : "Amount in AUD cents which may be debited on the Last Payment date."
+          }
+        }
+      }
+    }
+  }
+}
